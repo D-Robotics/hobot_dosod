@@ -171,7 +171,7 @@ Command executed: `ros2 run hobot_dosod hobot_dosod --ros-args -p feed_type:=0 -
 ```shell
 [WARN] [1736235231.771601056] [hobot_dosod]: This is hobot dosod!
 [WARN] [1736235231.847169623] [hobot_dosod]: Parameter:
- model_file_name: config/3x-l_epoch_100_rep-coco80-without-nms-int8.bin
+ model_file_name: config/dosod_mlp3x_l_rep-int8.bin
  vocabulary_file_name: config/offline_vocabulary.json
  feed_type(0:local, 1:sub): 0
  image: config/000000160864.jpg
@@ -195,7 +195,7 @@ Command executed: `ros2 run hobot_dosod hobot_dosod --ros-args -p feed_type:=0 -
  ros_img_sub_topic_name: /image
 [INFO] [1736235231.847331832] [dnn]: Node init.
 [INFO] [1736235231.847367582] [hobot_dosod]: Set node para.
-[WARN] [1736235231.847396749] [hobot_dosod]: model_file_name_: config/3x-l_epoch_100_rep-coco80-without-nms-int8.bin, task_num: 2
+[WARN] [1736235231.847396749] [hobot_dosod]: model_file_name_: config/dosod_mlp3x_l_rep-int8.bin, task_num: 2
 [INFO] [1736235231.847449540] [dnn]: Model init.
 [BPU_PLAT]BPU Platform Version(1.3.6)!
 [HBRT] set log level as 0. version = 3.15.54.0

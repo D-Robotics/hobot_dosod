@@ -37,7 +37,7 @@ def generate_launch_description():
         "dosod_msg_pub_topic_name", default_value=TextSubstitution(text="hobot_dosod")
     )
     model_file_name_launch_arg = DeclareLaunchArgument(
-        "dosod_model_file_name", default_value=TextSubstitution(text="config/3x-l_epoch_100_rep-coco80-without-nms-int8.bin")
+        "dosod_model_file_name", default_value=TextSubstitution(text="config/dosod_mlp3x_l_rep-int8.bin")
     )
     vocabulary_file_name_launch_arg = DeclareLaunchArgument(
         "dosod_vocabulary_file_name", default_value=TextSubstitution(text="config/offline_vocabulary.json")

@@ -54,7 +54,7 @@ class YoloOutputParser {
 
   int32_t SetScoreThreshold(float score_threshold) {score_threshold_ = score_threshold; return 0;}
   int32_t SetIouThreshold(float iou_threshold) {iou_threshold_ = iou_threshold; return 0;}
-  int32_t SetTopkThreshold(int nms_top_k) {nms_top_k_ = nms_top_k; return 0;}
+  int32_t SetTopk(int nms_top_k) {nms_top_k_ = nms_top_k; return 0;}
   int32_t SetClassMode(int class_mode) {class_mode_ = class_mode; return 0;}
   int32_t SetPoint(float x, float y) {
         Point point;

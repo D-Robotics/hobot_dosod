@@ -43,7 +43,7 @@ def generate_launch_description():
         "dosod_dump_raw_img", default_value=TextSubstitution(text="0")
     )
     model_file_name_launch_arg = DeclareLaunchArgument(
-        "dosod_model_file_name", default_value=TextSubstitution(text="config/3x-l_epoch_100_rep-coco80-without-nms-int8.bin")
+        "dosod_model_file_name", default_value=TextSubstitution(text="config/dosod_mlp3x_l_rep-int8.bin")
     )
     dump_ai_launch_arg = DeclareLaunchArgument(
         "dosod_dump_ai_result", default_value=TextSubstitution(text="0")

@@ -112,7 +112,7 @@ class DOSODNode : public DnnNode {
 
   // 用于解析的配置文件，以及解析后的数据
   std::string vocabulary_file_name_ = "config/offline_vocabulary.json";
-  std::string model_file_name_ = "config/3x-l_epoch_100_rep-coco80-without-nms-int8.bin";
+  std::string model_file_name_ = "config/dosod_mlp3x_l_rep-int8.bin";
   
   std::string model_name_ = "";
 

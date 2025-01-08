@@ -302,7 +302,7 @@ DOSODNode::DOSODNode(const std::string &node_name,
   parser = std::make_shared<YoloOutputParser>(num_class_, roi);
   parser->SetScoreThreshold(score_threshold_);
   parser->SetIouThreshold(iou_threshold_);
-  parser->SetTopkThreshold(nms_top_k_);
+  parser->SetTopk(nms_top_k_);
   parser->SetClassMode(class_mode_);
 
   parser->SetPoint(roi_x1, roi_y1);

@@ -8,16 +8,20 @@ DOSOD 功能包使用说明
 
 DOSOD 功能包是基于地瓜机器人自研的开放性词汇检测 [Decoupled Open-Set Object Detector](https://github.com/D-Robotics-AI-Lab/DOSOD) 量化部署的使用示例。图像数据来源于本地图片回灌和订阅到的image msg。此外, DOSOD 支持自定义类别检测, 可在模型导出量化阶段设置自定义类别, 此为DOSOD与常规检测算法最大区别。最终在DOSOD的后处理中发布智能结果, 可通过web查看效果。
 
+示例采用 coco 数据集 80 类别的检测类别, 如需要其他类别应用, 参考 [DOSOD部署到RDK X5/S100上](https://horizonrobotics.feishu.cn/docx/G5z3dOzWKozBtCxBZK9ceWEknTh)
+
 # 开发环境
 
 - 编程语言: C/C++
-- 开发平台: X5
+- 开发平台: X5/S100
 - 系统版本：Ubuntu 22.04
 - 编译工具链: Linux GCC 11.4.0
 
 # 编译
 
 - X5版本：支持在X5 Ubuntu系统上编译和在PC上使用docker交叉编译两种方式。
+
+- S100版本：支持在S100 Ubuntu系统上编译和在PC上使用docker交叉编译两种方式。
 
 同时支持通过编译选项控制编译pkg的依赖和pkg的功能。
 
@@ -45,11 +49,11 @@ hbm_img_msgs为自定义的图片消息格式, 用于shared mem场景下的图�
 - 如果关闭, 编译和运行不依赖hbm_img_msgs pkg, 支持使用原生ros和tros进行编译。
 - 对于shared mem通信方式, 当前只支持订阅nv12格式图片。
 
-## X5 Ubuntu系统上编译
+## RDK Ubuntu系统上编译
 
 1、编译环境确认
 
-- 板端已安装X5 Ubuntu系统。
+- 板端已安装X5/S100 Ubuntu系统。
 - 当前编译终端已设置TogetherROS环境变量：`source PATH/setup.bash`。其中PATH为TogetherROS的安装路径。
 - 已安装ROS2编译工具colcon。安装的ROS不包含编译工具colcon, 需要手动安装colcon。colcon安装命令：`pip install -U colcon-common-extensions`
 - 已编译dnn node package
@@ -58,7 +62,7 @@ hbm_img_msgs为自定义的图片消息格式, 用于shared mem场景下的图�
 
 - 编译命令：`colcon build --packages-select hobot_dosod`
 
-## docker交叉编译 X5版本
+## docker交叉编译
 
 1、编译环境确认
 
@@ -73,6 +77,9 @@ hbm_img_msgs为自定义的图片消息格式, 用于shared mem场景下的图�
   ```shell
   # RDK X5
   bash robot_dev_config/build.sh -p X5 -s hobot_dosod
+
+  # RDK S100
+  bash robot_dev_config/build.sh -p S100 -s hobot_dosod
   ```
 
 - 编译选项中默认打开了shared mem通信方式。
@@ -86,6 +93,7 @@ hbm_img_msgs为自定义的图片消息格式, 用于shared mem场景下的图�
 
 - mipi_cam package：发布图片msg
 - usb_cam package：发布图片msg
+- hobot_image_publisher package：发布图片msg
 - websocket package：渲染图片和ai感知msg
 
 ## 参数
@@ -93,18 +101,22 @@ hbm_img_msgs为自定义的图片消息格式, 用于shared mem场景下的图�
 | 参数名  | 解释  | 是否必须  | 默认值              | 备注 |
 | ------ | ----- | -------- | ------------------- | ---- |
 | feed_type          | 图片来源, 0：本地；1：订阅            | 否                   | 0                   |                                                                         |
+| model_file_name | 模型文件名 | 否 | "config/dosod_mlp3x_l_rep-int8.bin" | |
+| vocabulary_file_name | 词汇表文件名 | 否 | "config/offline_vocabulary.json" | |
 | image              | 本地图片地址                          | 否                   | config/000000160864.jpg     |                                                                         |
 | is_shared_mem_sub  | 使用shared mem通信方式订阅图片        | 否                   | 0                   |                                                                         |
 | score_threshold | 模型输出置信度阈值 | 否 | 0.2 | |
 | iou_threshold | nms iou阈值 | 否 | 0.5 | |
 | nms_top_k | 检测前k个框 | 否 | 50 | |
+| is_homography | 使用单应性变换 | 否 | 0 | |
+| trigger_mode | 触发器模式 | 0：无触发, else：其他模式 | 0 | |
 | dump_render_img    | 是否进行渲染，0：否；1：是            | 否                   | 0                   |   |
 | dump_raw_img    | 是否保存原图，0：否；1：是            | 否                   | 0                   |   |
 | dump_ai_result    | 是否保存智能结果，0：否；1：是            | 否                   | 0                   |   |
 | dump_render_path    | 渲染图片保存路径            | 否                   | .                   |   |
 | dump_raw_path    | 原图保存路径            | 否                   | .                   |   |
-| dump_ai_result    | 智能结果保存路径            | 否                   | .                   |   |
-| ai_msg_pub_topic_name | 发布智能结果的topicname,用于web端展示 | 否                   | /hobot_dosod | |
+| dump_ai_path    | 智能结果保存路径            | 否                   | .                   |   |
+| ai_msg_pub_topic_name | 发布智能结果的topicname,用于web端展示 | 否                   | /perception/detection/dosod | |
 | ros_img_sub_topic_name | 接收ros图片话题名 | 否                   | /image | |
 
 ## 运行
@@ -113,7 +125,7 @@ hbm_img_msgs为自定义的图片消息格式, 用于shared mem场景下的图�
 
 - 编译成功后, 将生成的install路径拷贝到地瓜RDK上（如果是在RDK上编译, 忽略拷贝步骤）, 并执行如下命令运行。
 
-## X5 Ubuntu系统上运行
+## RDK Ubuntu系统上运行
 
 运行方式1, 使用可执行文件启动：
 ```shell
@@ -150,7 +162,7 @@ export CAM_TYPE=mipi
 ros2 launch hobot_dosod dosod.launch.py
 ```
 
-## X5 Buildroot 系统上运行
+## Buildroot 系统上运行
 
 ```shell
 export ROS_LOG_DIR=/userdata/
@@ -203,7 +215,7 @@ log：
  task_num: 2
  roi: 0
  y_offset: 950
- ai_msg_pub_topic_name: /hobot_dosod
+ ai_msg_pub_topic_name: /perception/detection/dosod
  ros_img_sub_topic_name: /image
 [INFO] [1736235231.847331832] [dnn]: Node init.
 [INFO] [1736235231.847367582] [hobot_dosod]: Set node para.
@@ -228,7 +240,7 @@ name: 3x-l_epoch_100_rep-coco80-without-nms.
 [INFO] [1736235233.033161116] [dnn]: Set task_num [2]
 [WARN] [1736235233.033216533] [hobot_dosod]: Get model name: 3x-l_epoch_100_rep-coco80-without-nms from load model.
 [INFO] [1736235233.033263366] [hobot_dosod]: The model input width is 640 and height is 640
-[WARN] [1736235233.033804451] [hobot_dosod]: Create ai msg publisher with topic_name: /hobot_dosod
+[WARN] [1736235233.033804451] [hobot_dosod]: Create ai msg publisher with topic_name: /perception/detection/dosod
 [INFO] [1736235233.065223996] [hobot_dosod]: Dnn node feed with local image: config/000000160864.jpg
 [INFO] [1736235233.197520685] [hobot_dosod]: Output from frame_id: feedback, stamp: 0.0
 [INFO] [1736235233.211616539] [hobot_dosod]: out box size: 12

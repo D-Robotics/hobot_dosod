@@ -262,10 +262,19 @@ DOSODNode::DOSODNode(const std::string &node_name,
   auto model = GetModel();
   hbDNNTensorProperties tensor_properties;
   model->GetOutputTensorProperties(tensor_properties, 0);
+  hbDNNTensorProperties intput_tensor_properties;
+  model->GetInputTensorProperties(intput_tensor_properties, 0);
+  int input_shape_h = 0;
+  int input_shape_w = 0;
+#ifdef PLATFORM_X5
   num_class_ = tensor_properties.validShape.dimensionSize[3];
-  model->GetInputTensorProperties(tensor_properties, 0);
-  int input_shape_h = tensor_properties.validShape.dimensionSize[2];
-  int input_shape_w = tensor_properties.validShape.dimensionSize[3];
+  input_shape_h = tensor_properties.validShape.dimensionSize[2];
+  input_shape_w = tensor_properties.validShape.dimensionSize[3];
+#else
+  num_class_ = tensor_properties.validShape.dimensionSize[2];
+  input_shape_h = tensor_properties.validShape.dimensionSize[1];
+  input_shape_w = tensor_properties.validShape.dimensionSize[2];
+#endif
 
   if (roi) {
     roi_x2 = roi_x2 == -1 ? input_shape_w : roi_x2;

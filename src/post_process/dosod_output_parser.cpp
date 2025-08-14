@@ -52,10 +52,10 @@ int32_t YoloOutputParser::PostProcessWithoutDecode(
     std::vector<std::shared_ptr<DNNTensor>> &tensors,
     std::vector<std::string>& class_names,
     Perception &perception) {
-  hbSysFlushMem(&(tensors[0]->sysMem[0]), HB_SYS_MEM_CACHE_INVALIDATE);
-  hbSysFlushMem(&(tensors[1]->sysMem[0]), HB_SYS_MEM_CACHE_INVALIDATE);
-  auto *scores_data = reinterpret_cast<int16_t *>(tensors[0]->sysMem[0].virAddr);
-  auto *boxes_data = reinterpret_cast<int16_t *>(tensors[1]->sysMem[0].virAddr);
+  tensors[0]->CACHE_INVALIDATE();
+  tensors[1]->CACHE_INVALIDATE();
+  int16_t* scores_data = tensors[0]->GetTensorData<int16_t>();
+  int16_t* boxes_data = tensors[1]->GetTensorData<int16_t>();
 
   perception.type = Perception::DET;
   std::vector<Detection> dets;
@@ -63,23 +63,35 @@ int32_t YoloOutputParser::PostProcessWithoutDecode(
   int num_pred = 0;
   int num_class = 0;
   int num_class_ailgned = 0;
+  int num_box_ailgned = 0;
+
+#ifdef PLATFORM_X5
   if (tensors[0]->properties.tensorLayout == HB_DNN_LAYOUT_NCHW) {
     num_pred = tensors[0]->properties.alignedShape.dimensionSize[1];
     num_class_ailgned = tensors[0]->properties.alignedShape.dimensionSize[2];
+    num_box_ailgned = tensors[1]->properties.alignedShape.dimensionSize[2];
     num_class = tensors[0]->properties.validShape.dimensionSize[2];
   } else if (tensors[0]->properties.tensorLayout == HB_DNN_LAYOUT_NHWC) {
     num_pred = tensors[0]->properties.alignedShape.dimensionSize[3];
     num_class_ailgned = tensors[0]->properties.alignedShape.dimensionSize[1];
+    num_box_ailgned = tensors[1]->properties.alignedShape.dimensionSize[1];
     num_class = tensors[0]->properties.validShape.dimensionSize[1];
   } else {
     num_pred = tensors[0]->properties.alignedShape.dimensionSize[2];
     num_class_ailgned = tensors[0]->properties.alignedShape.dimensionSize[3];
+    num_box_ailgned = tensors[1]->properties.alignedShape.dimensionSize[3];
     num_class = tensors[0]->properties.validShape.dimensionSize[3];
   }
+#else
+  num_pred = tensors[0]->properties.validShape.dimensionSize[1];
+  num_class_ailgned = tensors[0]->properties.stride[1] / tensors[0]->properties.stride[2];
+  num_class = tensors[0]->properties.validShape.dimensionSize[2];
+  num_box_ailgned = tensors[1]->properties.stride[1] / tensors[1]->properties.stride[2];
+#endif
 
   for (int i = 0; i < num_pred; i++) {
     int16_t *score_data = scores_data + i * num_class_ailgned;
-    int16_t *box_data = boxes_data + i * 8;
+    int16_t *box_data = boxes_data + i * num_box_ailgned;
     float max_score = std::numeric_limits<float>::lowest(); // 初始最大值为最小可能值
     int max_index = -1;
     for (int k = 0; k < num_class; ++k) {

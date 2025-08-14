@@ -168,7 +168,7 @@ class DOSODNode : public DnnNode {
   std::string image_file_ = "config/000000160864.jpg";
 
   // 发布AI消息的topic和发布者
-  std::string ai_msg_pub_topic_name_ = "/hobot_dosod";
+  std::string ai_msg_pub_topic_name_ = "/perception/detection/dosod";
   rclcpp::Publisher<ai_msgs::msg::PerceptionTargets>::SharedPtr msg_publisher_ =
       nullptr;
 };

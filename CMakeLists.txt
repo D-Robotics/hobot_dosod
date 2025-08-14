@@ -61,17 +61,14 @@ if(PLATFORM_X5)
   message("build platform X5")
   add_definitions(-DPLATFORM_X5)
   set(PREFIX_PATH x5)
+elseif(PLATFORM_S100)
+  message("build platform S100")
+  add_definitions(-DPLATFORM_S100)
+  set(PREFIX_PATH s100)
 else()
-  if (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "aarch64")
-    message("invalid platform, build platform X5 default")
-    add_definitions(-PLATFORM_X5)
-    set(PREFIX_PATH x5)
-  elseif (${CMAKE_SYSTEM_PROCESSOR} STREQUAL "x86_64")
-    message("build platform X86")
-    add_definitions(-DPLATFORM_X86)
-    set(PREFIX_PATH x5)
-    set(SYS_ROOT ${THIRD_PARTY})
-  endif()
+  message("invalid platform, build platform X5 default")
+  add_definitions(-PLATFORM_X5)
+  set(PREFIX_PATH x5)
 endif()
 
 message("PREFIX_PATH is " ${PREFIX_PATH})
@@ -83,6 +80,7 @@ include_directories(include
 include_directories(
   ${SYS_ROOT}/usr/include/opencv/
   ${SYS_ROOT}/usr/include/
+  ${SYS_ROOT}/usr/include/hobot/
   ${SYS_ROOT}/usr/hobot/include/
 )
 
@@ -133,7 +131,7 @@ install(
 )
 
 install(DIRECTORY
-  ${PROJECT_SOURCE_DIR}/launch/
+  ${PROJECT_SOURCE_DIR}/launch/${PREFIX_PATH}/
   DESTINATION share/${PROJECT_NAME}/launch)
 
 install(DIRECTORY

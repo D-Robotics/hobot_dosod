@@ -7,16 +7,20 @@ Getting Started with Decoupled Open-Set Object Detector (DOSOD) Example
 
 The DOSOD package is an example of quantized deployment based on [Decoupled Open-Set Object Detector](https://github.com/D-Robotics-AI-Lab/DOSOD). The image data comes from local image feedback and subscribed image messages. Additionally, DOSOD supports custom detection categories detect, which is the biggest difference with conventional detector. Ultimately, intelligent results are published in the post-processing of DOSOD and can be viewed through a web interface.
 
+The example use coco 80 detection classes, for more classes, please use [DOSOD Deployment on RDK X5](https://horizonrobotics.feishu.cn/docx/MZgtdSDzNoHyOjxFSQbcRoVDnEj)
+
 # Development Environment
 
 - Programming Language: C/C++
-- Development Platform: X5
+- Development Platform: X5/S100
 - System Version: Ubuntu 22.04
 - Compilation Toolchain: Linaro GCC 11.4.0
 
 # Compilation
 
 - X5 Version: Supports compilation on the X5 Ubuntu system and cross-compilation using Docker on a PC.
+
+- S100 Version: Supports compilation on the S100 Ubuntu system and cross-compilation using Docker on a PC.
 
 It also supports controlling the dependencies and functionality of the compiled pkg through compilation options.
 
@@ -41,11 +45,11 @@ hbm_img_msgs is a custom image message format used for image transmission in sha
 - Shared memory transmission switch, enabled by default (ON), can be turned off during compilation using the -DSHARED_MEM=OFF command.
 - When enabled, compilation and execution depend on the hbm_img_msgs pkg and require the use of tros for compilation.
 - When disabled, compilation and execution do not depend on the hbm_img_msgs pkg, supporting compilation using native ROS and tros.
-- For shared memory communication, only subscription to nv12 format images is currently supported.## Compile on X5 Ubuntu System
+- For shared memory communication, only subscription to nv12 format images is currently supported.## Compile on RDK Ubuntu System
 
 1. Compilation Environment Verification
 
-- The X5 Ubuntu system is installed on the board.
+- The RDK Ubuntu system is installed on the board.
 - The current compilation terminal has set up the TogetherROS environment variable: `source PATH/setup.bash`. Where PATH is the installation path of TogetherROS.
 - The ROS2 compilation tool colcon is installed. If the installed ROS does not include the compilation tool colcon, it needs to be installed manually. Installation command for colcon: `pip install -U colcon-common-extensions`.
 - The dnn node package has been compiled.
@@ -54,7 +58,7 @@ hbm_img_msgs is a custom image message format used for image transmission in sha
 
 - Compilation command: `colcon build --packages-select hobot_dosod`
 
-## Docker Cross-Compilation for X5 Version
+## Docker Cross-Compilation
 
 1. Compilation Environment Verification
 
@@ -69,6 +73,9 @@ hbm_img_msgs is a custom image message format used for image transmission in sha
   ```shell
   # RDK X5
   bash robot_dev_config/build.sh -p X5 -s hobot_dosod
+
+  # RDK S100
+  bash robot_dev_config/build.sh -p S100 -s hobot_dosod
   ```
 
 - Shared memory communication method is enabled by default in the compilation options.
@@ -79,6 +86,7 @@ hbm_img_msgs is a custom image message format used for image transmission in sha
 
 - mipi_cam package: Publishes image messages
 - usb_cam package: Publishes image messages
+- hobot_image_publisher package：Publishes image messages
 - websocket package: Renders images and AI perception messages
 
 ## Parameters
@@ -86,23 +94,27 @@ hbm_img_msgs is a custom image message format used for image transmission in sha
 | Parameter Name      | Explanation                            | Mandatory            | Default Value       | Remarks                                                                 |
 | ------------------- | -------------------------------------- | -------------------- | ------------------- | ----------------------------------------------------------------------- |
 | feed_type           | Image source, 0: local; 1: subscribe   | No                   | 0                   |                                                                         |
+| model_file_name | model file name | No | "config/dosod_mlp3x_l_rep-int8.bin" | |
+| vocabulary_file_name | vocabulary file name | No | "config/offline_vocabulary.json" | |
 | image               | Local image path                       | No                   | config/000000160864.jpg     |                                                                         |
 | is_shared_mem_sub   | Subscribe to images using shared memory communication method | No  | 0                   |  |   |
 | score_threshold | boxes confidence threshold | No | 0.2 | |
 | iou_threshold | nms iou threshold | No | 0.5 | |
 | nms_top_k | Detect the first k boxes | No | 50 | |
+| is_homography | whether use homography | No | 0 | |
+| trigger_mode | trigger mode | 0：no trigger, else：other mode | 0 | |
 | dump_render_img     | Whether to render, 0: no; 1: yes       | No                   | 0                   |   |
 | dump_raw_img    | Whether to dump raw img, 0: no; 1: yes            | 否                   | 0                   |   |
 | dump_ai_result    | Whether to dump ai result, 0: no; 1: yes            | 否                   | 0                   |   |
 | dump_render_path    | Render image dump path            | 否                   | .                   |   |
 | dump_raw_path    | Raw img dump path            | 否                   | .                   |   |
-| dump_ai_result    | Ai result dump path            | 否                   | .                   |   |
-| ai_msg_pub_topic_name | Topic name for publishing intelligent results for web display | No                   | /hobot_dosod | |
+| dump_ai_path    | Ai result dump path            | 否                   | .                   |   |
+| ai_msg_pub_topic_name | Topic name for publishing intelligent results for web display | No                   | /perception/detection/dosod | |
 | ros_img_sub_topic_name | Topic name for subscribing image msg | No                   | /image | |
 
 ## Running
 
-## Running on X5 Ubuntu System
+## Running on RDK Ubuntu System
 
 Running method 1, use the executable file to start:
 ```shell
@@ -141,7 +153,7 @@ export CAM_TYPE=mipi
 ros2 launch hobot_dosod dosod.launch.py
 ```
 
-## Run on X5 Buildroot system:
+## Run on Buildroot system:
 
 ```shell
 export ROS_LOG_DIR=/userdata/
@@ -191,7 +203,7 @@ Command executed: `ros2 run hobot_dosod hobot_dosod --ros-args -p feed_type:=0 -
  task_num: 2
  roi: 0
  y_offset: 950
- ai_msg_pub_topic_name: /hobot_dosod
+ ai_msg_pub_topic_name: /perception/detection/dosod
  ros_img_sub_topic_name: /image
 [INFO] [1736235231.847331832] [dnn]: Node init.
 [INFO] [1736235231.847367582] [hobot_dosod]: Set node para.
@@ -216,7 +228,7 @@ name: 3x-l_epoch_100_rep-coco80-without-nms.
 [INFO] [1736235233.033161116] [dnn]: Set task_num [2]
 [WARN] [1736235233.033216533] [hobot_dosod]: Get model name: 3x-l_epoch_100_rep-coco80-without-nms from load model.
 [INFO] [1736235233.033263366] [hobot_dosod]: The model input width is 640 and height is 640
-[WARN] [1736235233.033804451] [hobot_dosod]: Create ai msg publisher with topic_name: /hobot_dosod
+[WARN] [1736235233.033804451] [hobot_dosod]: Create ai msg publisher with topic_name: /perception/detection/dosod
 [INFO] [1736235233.065223996] [hobot_dosod]: Dnn node feed with local image: config/000000160864.jpg
 [INFO] [1736235233.197520685] [hobot_dosod]: Output from frame_id: feedback, stamp: 0.0
 [INFO] [1736235233.211616539] [hobot_dosod]: out box size: 12

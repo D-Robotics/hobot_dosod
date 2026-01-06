@@ -19,7 +19,6 @@
 
 #include "hobot_cv/hobotcv_imgproc.h"
 #include "rclcpp/rclcpp.hpp"
-#include <cv_bridge/cv_bridge.h>
 #include <unistd.h>
 
 #include "dnn_node/dnn_node.h"

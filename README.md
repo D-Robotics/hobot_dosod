@@ -12,15 +12,17 @@ The example use coco 80 detection classes, for more classes, please use [DOSOD D
 # Development Environment
 
 - Programming Language: C/C++
-- Development Platform: X5/S100
-- System Version: Ubuntu 22.04
-- Compilation Toolchain: Linaro GCC 11.4.0
+- Development Platform: X5/S100/S600
+- System Version: Ubuntu 22.04/24.04
+- Compilation Toolchain: Linaro GCC 11.4.0/Linaro GCC 13.3.0
 
 # Compilation
 
 - X5 Version: Supports compilation on the X5 Ubuntu system and cross-compilation using Docker on a PC.
 
 - S100 Version: Supports compilation on the S100 Ubuntu system and cross-compilation using Docker on a PC.
+
+- S600 Version: Supports compilation on the S600 Ubuntu system and cross-compilation using Docker on a PC.
 
 It also supports controlling the dependencies and functionality of the compiled pkg through compilation options.
 
@@ -76,6 +78,9 @@ hbm_img_msgs is a custom image message format used for image transmission in sha
 
   # RDK S100
   bash robot_dev_config/build.sh -p S100 -s hobot_dosod
+
+  # RDK S600
+  bash robot_dev_config/build.sh -p S600 -s hobot_dosod
   ```
 
 - Shared memory communication method is enabled by default in the compilation options.
